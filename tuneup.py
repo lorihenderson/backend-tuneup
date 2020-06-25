@@ -5,21 +5,33 @@
 Use the timeit and cProfile libraries to find bad code.
 """
 
-__author__ = "???"
+__author__ = "Lori Henderson with some help from Chris Warren for the profile function"
 
 import cProfile
 import pstats
 import functools
+import timeit
 
 
 def profile(func):
     """A cProfile decorator function that can be used to
     measure performance.
     """
-    # Be sure to review the lesson material on decorators.
-    # You need to understand how they are constructed and used.
-    raise NotImplementedError("Complete this decorator function")
+    @functools.wraps(func)
+    def profile_wrapper(*args, **kwargs):
+        performance_object = cProfile.Profile()
+        performance_object.enable()
+        result = func(*args, **kwargs)
+        performance_object.disable()
 
+        get_stats_obj = pstats.Stats(performance_object)
+        get_stats_obj.strip_dirs()
+        get_stats_obj.sort_stats("cumulative")
+        get_stats_obj.print_stats()
+
+        return result
+
+    return profile_wrapper
 
 def read_movies(src):
     """Returns a list of movie titles."""
