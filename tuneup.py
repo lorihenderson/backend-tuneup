@@ -27,7 +27,7 @@ def profile(func):
         get_stats_obj = pstats.Stats(performance_object)
         get_stats_obj.strip_dirs()
         get_stats_obj.sort_stats("cumulative")
-        get_stats_obj.print_stats()
+        get_stats_obj.print_stats(10)
 
         return result
 
@@ -43,11 +43,11 @@ def read_movies(src):
 def is_duplicate(title, movies):
     """Returns True if title is within movies list."""
     for movie in movies:
-        if movie.lower() == title.lower():
+        if movie == title:
             return True
     return False
 
-
+@profile
 def find_duplicate_movies(src):
     """Returns a list of duplicate movies from a src list."""
     movies = read_movies(src)
@@ -61,8 +61,10 @@ def find_duplicate_movies(src):
 
 def timeit_helper():
     """Part A: Obtain some profiling measurements using timeit."""
-    # YOUR CODE GOES HERE
-    pass
+    t = timeit.Timer(stmt="find_duplicate_movies('movies.txt')", setup="from __main__ import find_duplicate_movies")
+    results = min(t.repeat(repeat=7, number=5))
+
+    return "Best time across 7 repeats of 5 runs per repeat:" + str(results) + "sec"
 
 
 def main():
@@ -70,6 +72,8 @@ def main():
     result = find_duplicate_movies('movies.txt')
     print(f'Found {len(result)} duplicate movies:')
     print('\n'.join(result))
+
+    print(f"Best time across 7 repeats of 5 runs per repeat: " + str(timeit_helper()) + "sec")
 
 
 if __name__ == '__main__':
